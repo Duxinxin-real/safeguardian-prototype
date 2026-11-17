@@ -58,6 +58,36 @@ header{padding:10px 23px 13px;color:white}h1{margin:0;font-size:45px;letter-spac
 <button class="row"><span class="badge red"><svg><use href="#ban"/></svg></span><span class="label">Ad blocking</span><span class="row-status">Off</span><svg class="chevron"><use href="#arrow"/></svg></button>
 <button class="row"><span class="badge purple"><svg><use href="#window"/></svg></span><span class="label">Pop-up blocking</span><span class="row-status">Off</span><svg class="chevron"><use href="#arrow"/></svg></button>
 <button class="row"><span class="badge green"><svg><use href="#eye"/></svg></span><span class="label">Tracker blocking</span><span class="row-status">Off</span><svg class="chevron"><use href="#arrow"/></svg></button>
+<button class="row" data-protection="malicious"><span class="badge blue"><svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15.686 15A14.5 14.5 0 0 1 12 22a14.5 14.5 0 0 1 0-20 10 10 0 1 0 9.542 13" />
+  <path d="M2 12h8.5" />
+  <path d="M20 6V4a2 2 0 1 0-4 0v2" />
+  <rect width="8" height="5" x="14" y="6" rx="1" />
+</svg></span><span class="label">Malicious websites</span><span class="row-status">Off</span><svg class="chevron"><use href="#arrow"/></svg></button>
+<button class="row" data-protection="mining"><span class="badge purple"><svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+  <path d="m9 12 2 2 4-4" />
+</svg></span><span class="label">Crypto mining scripts</span><span class="row-status">Off</span><svg class="chevron"><use href="#arrow"/></svg></button>
 <h2 class="tools-title">Privacy Tools</h2><div class="tools">
 <button class="row"><span class="badge green"><svg><use href="#person"/></svg></span><span class="label">Contacts</span><svg class="chevron"><use href="#arrow"/></svg></button>
 <button class="row"><span class="badge red"><svg><use href="#calendar"/></svg></span><span class="label">Calendar</span><svg class="chevron"><use href="#arrow"/></svg></button>
@@ -155,7 +185,64 @@ const testPage = document.createElement('section');
 testPage.className = 'test-page';
 testPage.hidden = true;
 testPage.setAttribute('aria-label','Network Speed Test');
-testPage.innerHTML = `<div class="test-top"><h1>WiFi Test</h1></div><section class="test-card"><div class="speed-stage"><svg class="speed-dial" viewBox="0 0 340 250"><defs><linearGradient id="dial-color"><stop stop-color="#064aff"/><stop offset="1" stop-color="#b8c2ff"/></linearGradient></defs><path class="dial-track" d="M53 202 A125 125 0 1 1 287 202"/><path class="dial-progress" pathLength="100" d="M53 202 A125 125 0 1 1 287 202"/><g class="dial-ticks"></g><g class="dial-needle"><path d="M166 145 L170 30 L174 145 Z" fill="#031b40"/><circle cx="170" cy="145" r="7" fill="#031b40" stroke="white"/></g></svg><div class="speed-number"><div class="speed-value">186.4</div><div class="speed-unit">Mbps</div><div class="speed-phase" role="status">Test complete</div></div></div><div class="speed-metrics"><div><span class="badge blue"><span class="asset-icon" style="--icon:url(icons/arrow-down.svg)" aria-hidden="true"></span></span>Download<p><strong class="download-result">186.4</strong><small>Mbps</small></p></div><div><span class="badge green"><span class="asset-icon" style="--icon:url(icons/upload.svg)" aria-hidden="true"></span></span>Upload<p><strong class="upload-result">42.8</strong><small>Mbps</small></p></div><div><span class="badge purple"><span class="asset-icon" style="--icon:url(icons/arrow-left-right.svg)" aria-hidden="true"></span></span>Ping<p><strong class="ping-result">18</strong><small>ms</small></p></div></div><button class="start-test">Test Again</button></section><section class="wifi-card"><h2>Wi-Fi Check</h2><div class="wifi-row"><span class="badge green"><svg><use href="#lock"/></svg></span><span>WiFi Authentication</span><strong class="wifi-result">Safe</strong></div><div class="wifi-row"><span class="badge blue"><span class="asset-icon" style="--icon:url(icons/globe-lock.svg)" aria-hidden="true"></span></span><span>DNS Security</span><strong class="wifi-result">Safe</strong></div></section>`;
+testPage.innerHTML = `<div class="test-top"><h1>WiFi Test</h1></div><section class="test-card"><div class="speed-stage"><svg class="speed-dial" viewBox="0 0 340 250"><defs><linearGradient id="dial-color"><stop stop-color="#064aff"/><stop offset="1" stop-color="#b8c2ff"/></linearGradient></defs><path class="dial-track" d="M53 202 A125 125 0 1 1 287 202"/><path class="dial-progress" pathLength="100" d="M53 202 A125 125 0 1 1 287 202"/><g class="dial-ticks"></g><g class="dial-needle"><path d="M166 145 L170 30 L174 145 Z" fill="#031b40"/><circle cx="170" cy="145" r="7" fill="#031b40" stroke="white"/></g></svg><div class="speed-number"><div class="speed-value">186.4</div><div class="speed-unit">Mbps</div><div class="speed-phase" role="status">Test complete</div></div></div><div class="speed-metrics"><div><span class="badge blue"><svg class="test-feature-icon" aria-hidden="true"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 5v14" />
+  <path d="m19 12-7 7-7-7" />
+</svg></span>Download<p><strong class="download-result">186.4</strong><small>Mbps</small></p></div><div><span class="badge green"><svg class="test-feature-icon" aria-hidden="true"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 3v12" />
+  <path d="m17 8-5-5-5 5" />
+  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+</svg></span>Upload<p><strong class="upload-result">42.8</strong><small>Mbps</small></p></div><div><span class="badge purple"><svg class="test-feature-icon" aria-hidden="true"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M8 3 4 7l4 4" />
+  <path d="M4 7h16" />
+  <path d="m16 21 4-4-4-4" />
+  <path d="M20 17H4" />
+</svg></span>Ping<p><strong class="ping-result">18</strong><small>ms</small></p></div></div><button class="start-test">Test Again</button></section><section class="wifi-card"><h2>Wi-Fi Check</h2><div class="wifi-row"><span class="badge green"><svg><use href="#lock"/></svg></span><span>WiFi Authentication</span><strong class="wifi-result">Safe</strong></div><div class="wifi-row"><span class="badge blue"><svg class="test-feature-icon" aria-hidden="true"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15.686 15A14.5 14.5 0 0 1 12 22a14.5 14.5 0 0 1 0-20 10 10 0 1 0 9.542 13" />
+  <path d="M2 12h8.5" />
+  <path d="M20 6V4a2 2 0 1 0-4 0v2" />
+  <rect width="8" height="5" x="14" y="6" rx="1" />
+</svg></span><span>DNS Security</span><strong class="wifi-result">Safe</strong></div></section>`;
 phone.insertBefore(testPage,document.querySelector('.tabs'));
 for(let index=0;index<=30;index++) {
   const angle=(-90+index*6)*Math.PI/180;
@@ -210,6 +297,7 @@ function stopSpeedTest() {
   startTest.textContent = completedTests ? 'Test Again' : 'Start Test';
   testPage.querySelector('.speed-phase').textContent = 'Test stopped';
   testPage.querySelectorAll('.wifi-result').forEach(result=>{result.textContent='Not tested';result.classList.add('pending');});
+  testPage.dispatchEvent(new Event('wifi-check-stopped'));
 }
 startTest.addEventListener('click',()=>{
   startTest.disabled=true;
@@ -238,6 +326,7 @@ startTest.addEventListener('click',()=>{
       updateGauge(download);
       testPage.querySelector('.speed-phase').textContent='Test complete';
       testPage.querySelectorAll('.wifi-result').forEach(result=>{result.textContent='Safe';result.classList.remove('pending');});
+      testPage.dispatchEvent(new Event('wifi-check-complete'));
       completedTests++;
       startTest.disabled=false;startTest.textContent='Test Again';
     }

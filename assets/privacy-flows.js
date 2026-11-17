@@ -1,17 +1,21 @@
 (() => {
-  const state = {page:'', permission:{web:false,calls:false,sms:false}, enabled:{ads:false,popups:false,trackers:false,calls:false,sms:false}, numbers:[], rules:{promotions:true,scams:true}};
+  const state = {page:'', permission:{web:false,calls:false,sms:false}, enabled:{ads:false,popups:false,trackers:false,malicious:false,mining:false,calls:false,sms:false}, numbers:[], rules:{promotions:true,scams:true}};
+  const webKeys = ['ads','popups','trackers','malicious','mining'];
   const metadata = {name:'SafeGuardian',version:'1.0.0',privacy:'',terms:'',email:''};
   let stopGuide = () => {};
   const descriptions = {
     ads:['Ad blocking','ban','red','Reduce distracting ads while browsing in Safari.'],
     popups:['Pop-up blocking','app-window','purple','Block unwanted pop-ups on supported websites.'],
     trackers:['Tracker blocking','eye-off','green','Limit known trackers while browsing in Safari.'],
+    malicious:['Malicious websites','globe-lock','blue','Block known phishing and malicious websites in Safari.'],
+    mining:['Crypto mining scripts','shield-check','purple','Block known browser-based cryptocurrency mining scripts in Safari.'],
     calls:['Spam Calls Filter','phone','blue','Identify and block known unwanted callers.'],
     sms:['SMS Filter','message-square','purple','Filter unwanted messages from unknown senders.']
   };
   const page = document.createElement('section'); page.className='utility-page'; page.hidden=true; phone.append(page);
   const alert = document.createElement('section'); alert.className='utility-alert'; alert.hidden=true; phone.append(alert);
-  const icon = name => `<span class="asset-icon" style="--icon:url(icons/${name}.svg)" aria-hidden="true"></span>`;
+  const webIcons = {"globe-lock": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M15.686 15A14.5 14.5 0 0 1 12 22a14.5 14.5 0 0 1 0-20 10 10 0 1 0 9.542 13\" />\n  <path d=\"M2 12h8.5\" />\n  <path d=\"M20 6V4a2 2 0 1 0-4 0v2\" />\n  <rect width=\"8\" height=\"5\" x=\"14\" y=\"6\" rx=\"1\" />\n</svg>", "shield-check": "<svg\n  xmlns=\"http://www.w3.org/2000/svg\"\n  width=\"24\"\n  height=\"24\"\n  viewBox=\"0 0 24 24\"\n  fill=\"none\"\n  stroke=\"currentColor\"\n  stroke-width=\"2\"\n  stroke-linecap=\"round\"\n  stroke-linejoin=\"round\"\n>\n  <path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\" />\n  <path d=\"m9 12 2 2 4-4\" />\n</svg>"};
+  const icon = name => webIcons[name] || `<span class="asset-icon" style="--icon:url(icons/${name}.svg)" aria-hidden="true"></span>`;
   const button = (command,text,extra='') => `<button class="utility-button" data-command="${command}" ${extra}>${text}</button>`;
   const row = (command,text,value='',symbol='') => `<button class="utility-row" data-command="${command}">${symbol ? icon(symbol) : ''}${text}<span>${value}<svg class="chevron" aria-hidden="true"><use href="#arrow"/></svg></span></button>`;
   const tabs = document.querySelector('.tabs');
@@ -33,11 +37,11 @@
   }
   alert.addEventListener('keydown',event=>{if(event.key==='Escape')dismiss();if(event.key==='Tab'){event.preventDefault();const buttons=[...alert.querySelectorAll('button')];buttons[(buttons.indexOf(document.activeElement)+1)%2].focus();}});
   function sync(){
-    const enabled=state.enabled.ads||state.enabled.popups||state.enabled.trackers;
+    const enabled=webKeys.some(key=>state.enabled[key]);
     phone.classList.toggle('is-active',enabled);protectionSwitch.setAttribute('aria-checked',String(enabled));
     protectionSwitch.setAttribute('aria-label',enabled?'Disable Safari protection':'Enable Safari protection');
     document.querySelector('.state').lastChild.textContent=enabled?'Active':'Inactive';
-    ['ads','popups','trackers'].forEach((key,index)=>{document.querySelectorAll('.row-status')[index].textContent=state.enabled[key]?'On':'Off';});
+    webKeys.forEach((key,index)=>{document.querySelectorAll('.row-status')[index].textContent=state.enabled[key]?'On':'Off';});
     activeShield.setAttribute('aria-hidden',String(!enabled));inactiveShield.setAttribute('aria-hidden',String(enabled));
   }
   function open(name){state.page=name;render();page.scrollTop=0;}
@@ -48,7 +52,7 @@
     const name=state.page;
     if(descriptions[name]){
       const [title,symbol,color,description]=descriptions[name];
-      shell(title,`<section class="utility-card utility-hero"><span class="badge ${color}">${icon(symbol)}</span><h2>${title}</h2><span class="utility-status ${state.enabled[name]?'on':''}">${state.enabled[name]?'On':'Off'}</span><p>${description}</p>${button('toggle',state.enabled[name]?'Turn Off':'Turn On')}</section>${name==='calls'?`<section class="utility-card">${row('numbers','Blocked Numbers',String(state.numbers.length),'phone')}<p>Protection depends on the available number list. Not every unwanted call can be identified.</p></section>`:name==='sms'?`<section class="utility-card">${row('sms-rules','Filter Rules','','message-square')}<p>Filtering does not cover every conversation or messaging app.</p></section>`:'<section class="utility-card"><h2>In Safari</h2><p>Some ads or tracking may still appear. This does not affect other apps.</p></section>'}`);
+      shell(title,`<section class="utility-card utility-hero"><span class="badge ${color}">${icon(symbol)}</span><h2>${title}</h2><span class="utility-status ${state.enabled[name]?'on':''}">${state.enabled[name]?'On':'Off'}</span><p>${description}</p>${button('toggle',state.enabled[name]?'Turn Off':'Turn On')}</section>${name==='calls'?`<section class="utility-card">${row('numbers','Blocked Numbers',String(state.numbers.length),'phone')}<p>Protection depends on the available number list. Not every unwanted call can be identified.</p></section>`:name==='sms'?`<section class="utility-card">${row('sms-rules','Filter Rules','','message-square')}<p>Filtering does not cover every conversation or messaging app.</p></section>`:'<section class="utility-card"><h2>In Safari</h2><p>Protection applies to Safari and supported blocking rules. It does not scan your device or protect other apps.</p></section>'}`);
     }else if(name==='tutorial'){
       const type=state.tutorial;
       const title={web:'Enable Web Cleanup',calls:'Enable Spam Calls',sms:'Enable SMS Filter'}[type];
@@ -82,14 +86,14 @@
     const command=event.target.closest('[data-command]')?.dataset.command;if(!command)return;
     if(command==='back'){if(state.page==='tutorial')returnFromTutorial();else if(['numbers','sms-rules'].includes(state.page))open(state.page==='numbers'?'calls':'sms');else if(['about','privacy','terms','feedback'].includes(state.page))open('me');else close();}
     else if(command==='toggle'){
-      const key=state.page;const permission=['ads','popups','trackers'].includes(key)?'web':key;
+      const key=state.page;const permission=webKeys.includes(key)?'web':key;
       if(state.enabled[key])confirm('Turn Off Protection?','This protection will be paused.',()=>{state.enabled[key]=false;sync();render();});
       else if(!state.permission[permission])tutorial(permission,key);
       else{state.enabled[key]=true;sync();render();}
     }else if(command==='settings'){
       const permission=state.tutorial;
       state.permission[permission]=true;
-      if(permission==='web')['ads','popups','trackers'].forEach(key=>{state.enabled[key]=true;});
+      if(permission==='web')webKeys.forEach(key=>{state.enabled[key]=true;});
       else state.enabled[permission]=true;
       sync();
       config.querySelectorAll('[data-grant]').forEach(control=>control.setAttribute('aria-pressed',String(control.dataset.grant==='on')));
@@ -103,12 +107,12 @@
   toolRows.insertAdjacentHTML('beforebegin',row('calls','Spam Calls Filter','','phone'));
   toolRows.previousElementSibling.addEventListener('click',()=>open('calls'));
   toolRows.addEventListener('click',event=>{const name=event.target.closest('[data-command]')?.dataset.command;if(name)open(name);});
-  document.querySelectorAll('.row-status').forEach((status,index)=>{const old=status.closest('button');const fresh=old.cloneNode(true);fresh.removeAttribute('data-message');old.replaceWith(fresh);fresh.onclick=()=>open(['ads','popups','trackers'][index]);});
+  document.querySelectorAll('.row-status').forEach((status,index)=>{const old=status.closest('button');const fresh=old.cloneNode(true);fresh.removeAttribute('data-message');old.replaceWith(fresh);fresh.onclick=()=>open(webKeys[index]);});
   protectionSwitch.addEventListener('click',event=>{
     event.stopImmediatePropagation();
     if(!state.permission.web){tutorial('web','home');return;}
-    if(state.enabled.ads||state.enabled.popups||state.enabled.trackers)confirm('Turn Off Web Cleanup?','Ad, pop-up and tracker protection will be paused.',()=>{['ads','popups','trackers'].forEach(key=>state.enabled[key]=false);sync();});
-    else{['ads','popups','trackers'].forEach(key=>state.enabled[key]=true);sync();}
+    if(webKeys.some(key=>state.enabled[key]))confirm('Turn Off Web Cleanup?','All five Safari protections will be paused.',()=>{webKeys.forEach(key=>state.enabled[key]=false);sync();});
+    else{webKeys.forEach(key=>state.enabled[key]=true);sync();}
   },true);
   tabs.addEventListener('click',event=>{
     const target=event.target.closest('button');if(!target)return;close();
