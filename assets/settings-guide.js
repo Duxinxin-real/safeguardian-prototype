@@ -2,58 +2,18 @@ window.SafeGuardianGuide = {
   mount(container, type) {
     if (type === 'web') {
       container.classList.add('video-tutorial');
-      const glyphs = {
-        play:'<path d="m9 5 11 7-11 7Z"/>',
-        pause:'<path d="M8 5v14M16 5v14"/>',
-        sound:'<path d="M11 5 6 9H3v6h3l5 4Z"/><path d="M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/>',
-        muted:'<path d="M11 5 6 9H3v6h3l5 4Z"/><path d="m16 9 6 6m0-6-6 6"/>',
-        expand:'<path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/>',
-        collapse:'<path d="M3 8h5V3m8 0v5h5M8 21v-5H3m13 5v-5h5"/>'
-      };
-      const svg = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${glyphs[name]}</svg>`;
-      container.innerHTML = `<div class="guide-video-stage"><div class="guide-player"><video class="guide-video" playsinline preload="metadata" poster="assets/tutorials/safari-settings-poster.jpg" aria-label="Safari settings tutorial with English narration"><source src="assets/tutorials/safari-settings-guide.mp4?v=single-natural-22" type="video/mp4"></video><div class="guide-player-controls"><input class="guide-seek" type="range" min="0" max="22" step="0.1" value="0" aria-label="Video progress"><div class="guide-player-buttons"><button type="button" data-video="play" aria-label="Play tutorial">${svg('play')}</button><span class="guide-video-time">0:00 / 0:22</span><button type="button" data-video="sound" aria-label="Mute narration">${svg('sound')}</button><button type="button" data-video="expand" aria-label="Expand tutorial" aria-expanded="false">${svg('expand')}</button></div></div></div></div><div class="guide-copy"><h2 class="guide-caption">Enable Safari protection</h2><button class="utility-button" data-command="settings">Open Settings</button></div>`;
+      container.innerHTML = `<div class="guide-video-stage"><video class="guide-video" autoplay playsinline preload="auto" poster="assets/tutorials/safari-settings-poster.jpg" aria-label="Safari settings tutorial with English narration"><source src="assets/tutorials/safari-settings-guide.mp4?v=single-natural-22" type="video/mp4"></video></div><div class="guide-copy"><h2 class="guide-caption">Enable Safari protection</h2><button class="utility-button" data-command="settings">Open Settings</button></div>`;
       const video = container.querySelector('video');
-      const page = container.closest('.utility-page');
-      const playButton = container.querySelector('[data-video="play"]');
-      const soundButton = container.querySelector('[data-video="sound"]');
-      const expandButton = container.querySelector('[data-video="expand"]');
-      const seek = container.querySelector('.guide-seek');
-      const time = value => `${Math.floor(value / 60)}:${String(Math.floor(value % 60)).padStart(2,'0')}`;
-      const sync = () => {
-        playButton.innerHTML = svg(video.paused ? 'play' : 'pause');
-        playButton.setAttribute('aria-label',video.paused ? 'Play tutorial' : 'Pause tutorial');
-        soundButton.innerHTML = svg(video.muted ? 'muted' : 'sound');
-        soundButton.setAttribute('aria-label',video.muted ? 'Unmute narration' : 'Mute narration');
-        seek.max = Number.isFinite(video.duration) ? video.duration : 22;
-        seek.value = video.currentTime;
-        container.querySelector('.guide-video-time').textContent = `${time(video.currentTime)} / ${time(Number(seek.max))}`;
-      };
-      const play = () => { if(video.ended)video.currentTime=0; video.play().catch(sync); };
-      playButton.onclick = () => video.paused ? play() : video.pause();
-      video.onclick = playButton.onclick;
-      soundButton.onclick = () => {video.muted=!video.muted;sync();};
-      seek.oninput = () => {video.currentTime=Number(seek.value);sync();};
-      const expand = value => {
-        page.classList.toggle('video-expanded',value);
-        page.querySelector('.utility-heading').inert=value;
-        container.querySelector('.guide-copy').inert=value;
-        expandButton.innerHTML=svg(value?'collapse':'expand');
-        expandButton.setAttribute('aria-label',value?'Minimize tutorial':'Expand tutorial');
-        expandButton.setAttribute('aria-expanded',String(value));
-      };
-      expandButton.onclick = () => expand(!page.classList.contains('video-expanded'));
-      const escape = event => {if(event.key==='Escape' && page.classList.contains('video-expanded')){event.preventDefault();expand(false);expandButton.focus();}};
-      container.addEventListener('keydown',escape);
-      ['play','pause','ended','volumechange','timeupdate','loadedmetadata'].forEach(event=>video.addEventListener(event,sync));
-      play();
+      video.play().catch(() => {
+        // Browsers that reject audible autoplay can still show the walkthrough.
+        video.muted = true;
+        video.play().catch(() => {});
+      });
       const stopWhenHidden = () => { if (document.hidden) video.pause(); };
       document.addEventListener('visibilitychange', stopWhenHidden);
       return () => {
-        expand(false);
         document.removeEventListener('visibilitychange', stopWhenHidden);
-        container.removeEventListener('keydown',escape);
         video.pause();
-        video.removeAttribute('src');
         video.querySelectorAll('source').forEach(source => source.removeAttribute('src'));
         video.load();
       };
